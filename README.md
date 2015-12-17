@@ -1,4 +1,4 @@
-## Setup L2TP VPN Server and Client
+## Setup L2TP VPN Client
 
 ##### With a bit of weight on Ubuntu.
 
@@ -30,7 +30,7 @@ sudo l2tp-vpn connect vpn-connection-1
 sudo l2tp-vpn disconnect vpn-connection-1
 ```
 
-### How To Setup the L2TP Server
+## Setup the L2TP Server
 
 #### On an Ubuntu Box
 
