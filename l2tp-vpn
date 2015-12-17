@@ -1,0 +1,94 @@
+#!/bin/bash
+
+usage() {
+  echo "Arguments: [connect|disconnect] <connection name>"
+  echo ""
+  echo "Your connection configurations can be found under /etc/xl2tpd and each config file is named '<connection name>.conf'"
+  echo ""
+}
+
+if [[ -z $1 || -z $2 ]]; then
+  usage
+  exit 1
+fi
+
+VPN_NAME=$2
+
+# Read VPN configuration
+source /etc/xl2tpd/${VPN_NAME}.conf
+
+if [[ $1 == "disconnect" ]]; then
+  LOCAL_GW=$(ip route get $VPN_SERVER | awk '{ print $3 }')
+  LOCAL_IFACE=$(ip route get $VPN_SERVER | awk '{ print $5 }')
+
+  /usr/sbin/ipsec auto --down $VPN_NAME
+  /bin/echo "d vpn-connection" > /var/run/xl2tpd/l2tp-control
+  service xl2tpd stop
+  service ipsec stop
+  
+  ip route del $VPN_SERVER via $LOCAL_GW
+  ip route add default via $LOCAL_GW
+  exit 0
+fi
+
+# Check if a tunnel is already open
+ip link | grep ppp0
+RC=$?
+if [[ $RC == 0 ]]; then
+  ping -c1 $VPN_GW
+  RC=$?
+  echo "There seems to be a tunnel already open as there's a network interface ppp0 present."
+  if [[ $RC == 0 ]]; then
+    echo "The VPN gateway $VPN_GW is pingable. If you are still having issues speak with your system administrator."
+  else
+    echo "The VPN gateway $VPN_GW is not pingable. Are you sure the installation worked without any failures?"
+  fi
+  exit 1
+fi
+
+# Get local network configuration
+LOCAL_IP=$(ip route get 8.8.8.8 | awk '{ print $7 }')
+LOCAL_GW=$(ip route get 8.8.8.8 | awk '{ print $3 }')
+LOCAL_IFACE=$(ip route get 8.8.8.8 | awk '{ print $5 }')
+
+# Re-configure xl2tpd with current local interface
+sed -E -i "s/\"--interface=.*\"$/\"--interface=$LOCAL_IFACE\"/" /etc/ipsec.conf
+sed -E -i "s/left=.*$/left=$LOCAL_IP/" /etc/ipsec.conf
+
+# Start services
+service ipsec restart
+sleep 3
+service xl2tpd restart
+sleep 3
+ipsec auto --up $VPN_NAME
+
+RC=$?
+if [[ $RC != 0 ]]; then
+  echo "Failed to open ipsec tunnel"
+  exit $RC
+fi
+
+# Start tunnel
+echo "c $VPN_NAME" > /var/run/xl2tpd/l2tp-control
+
+# Give the connection time to initiate
+sleep 3
+
+# Redirect all traffic through VPN
+ip route add $VPN_SERVER via $LOCAL_GW dev $LOCAL_IFACE
+
+# Remove original default route
+ip route del default via $LOCAL_GW
+
+while true
+do
+# Add default route to be via the VPN gateway
+ip route add default via $VPN_GW
+ip route | grep "default via $VPN_GW dev ppp0"
+RC=$?
+if [[ $RC == 0 ]]; then
+  break
+fi
+echo "Waiting for ppp connection to get ready..."
+sleep 2
+done
