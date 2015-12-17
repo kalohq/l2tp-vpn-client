@@ -19,15 +19,15 @@ Follow these [instructions](https://www.softether.org/4-docs/2-howto/9.L2TPIPsec
 - Go to this directory in a shell
 - Run this command with the above information
 
-      sudo bash -x install.sh vpn-connection-1 <VPN server IP> <VPN user> <VPN password> <VPN pre-shared key>
+        sudo bash -x install.sh vpn-connection-1 <VPN server IP> <VPN user> <VPN password> <VPN pre-shared key>
 
 Then to connect and disconnect:
 
 ```
 # Connect
-sudo l2tp-vpn connect lystable-aws-vpn
+sudo l2tp-vpn connect vpn-connection-1
 # Disconnect
-sudo l2tp-vpn disconnect lystable-aws-vpn
+sudo l2tp-vpn disconnect vpn-connection-1
 ```
 
 ### How To Setup the L2TP Server
