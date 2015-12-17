@@ -1,7 +1,5 @@
 ## Setup L2TP VPN Client
 
-##### With a bit of weight on Ubuntu.
-
 You'll need:
 
 - VPN Server IP
