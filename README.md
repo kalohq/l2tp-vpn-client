@@ -7,6 +7,10 @@ You'll need:
 - VPN user
 - VPN password
 
+### Windows 10
+
+Follow these [instructions](http://strongvpn.com/setup_windows_10_l2tp.html) and use the above information.
+
 ### Mac
 
 Follow these [instructions](https://www.softether.org/4-docs/2-howto/9.L2TPIPsec_Setup_Guide_for_SoftEther_VPN_Server/5.Mac_OS_X_L2TP_Client_Setup) and use the above information.
