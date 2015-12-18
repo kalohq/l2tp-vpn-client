@@ -7,6 +7,8 @@ You'll need:
 - VPN user
 - VPN password
 
+These parameters will be be given to you by your VPN administrator or will be set when you setup your VPN server (instructions at the bottom of this page).
+
 ### Windows 10
 
 Follow these [instructions](http://strongvpn.com/setup_windows_10_l2tp.html) and use the above information.
