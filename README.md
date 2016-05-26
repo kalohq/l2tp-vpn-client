@@ -40,3 +40,6 @@ sudo l2tp-vpn disconnect vpn-connection-1
 
 Run this [script](https://github.com/sarfata/voodooprivacy/blob/master/voodoo-vpn.sh) after setting the VPN user / password / pre-shared key parameters inside it.
 
+## License
+
+Apache 2.0. See LICENSE for details
